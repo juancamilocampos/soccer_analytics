@@ -115,7 +115,7 @@ def draw_player_pitch_control(X, Y, pitch_control, x_player, y_player, theta,spe
     ax.arrow(x_player, y_player, dx, dy, length_includes_head=False, width=0.2, color='black', alpha=0.5)
     contours = plt.contour(X, Y, pitch_control, cmap='RdBu')
     plt.clabel(contours, inline=True, fontsize=12)
-    plt.title('Player Pitch Control', fontsize=24, color='white')
+    plt.title('Player Influence Area', fontsize=24, color='white')
 
     # Used to return the plot as an image rray
     fig.canvas.draw()       # draw the canvas, cache the renderer
