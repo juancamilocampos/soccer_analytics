@@ -56,7 +56,6 @@ def create_football_field(figsize=(12*2, 6.33*2), goals=True):
     plt.xlim(-56, 56)
     plt.ylim(-37, 37)
     plt.axis('off')
-
     return fig, ax
 
 def show_players_and_ball(row):
@@ -98,6 +97,25 @@ def show_voronoi(row):
                 #Defense players
                 plt.fill(*zip(*polygon), c='r', alpha=0.25, edgecolor="black", linewidth=0.0)
                 plt.plot(*zip(*polygon), c='black', alpha=0.25, linewidth=3)
+
+    # Used to return the plot as an image rray
+    fig.canvas.draw()       # draw the canvas, cache the renderer
+    image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
+    image  = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+    return image
+
+def get_dx_dy(radian_angle, dist):
+    dx = dist * math.cos(radian_angle)
+    dy = dist * math.sin(radian_angle)
+    return dx, dy
+
+def draw_player_pitch_control(X, Y, pitch_control, x_player, y_player, theta,speed, row):
+    fig, ax = show_players_and_ball(row)
+    dx, dy = get_dx_dy(theta, speed)
+    ax.arrow(x_player, y_player, dx, dy, length_includes_head=False, width=0.2, color='black', alpha=0.5)
+    contours = plt.contour(X, Y, pitch_control, cmap='RdBu')
+    plt.clabel(contours, inline=True, fontsize=12)
+    plt.title('Player Pitch Control', fontsize=24, color='white')
 
     # Used to return the plot as an image rray
     fig.canvas.draw()       # draw the canvas, cache the renderer
