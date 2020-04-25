@@ -6,4 +6,8 @@ Voronoi Diagrams animation (Python).
 
 Player Influence Area
 
-![](player_pitch_control.gif)
+![](player_influence_area.gif)
+
+Pitch Control
+
+![](pitch_control.gif)

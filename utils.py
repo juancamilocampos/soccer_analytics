@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 from scipy.spatial import Voronoi, voronoi_plot_2d
+import matplotlib.cm as cm
 
 plt.ioff()
 
@@ -63,9 +64,9 @@ def show_players_and_ball(row):
     ball = row[-2:]
     defense, offense = [x.reshape(-1,2) for x in row[:-2].reshape(-1,11*2)]
 
-    ax.scatter(offense[:,0],offense[:,1], c='b', s=150, zorder=2)
-    ax.scatter(defense[:,0],defense[:,1], c='r', s=150, zorder=2)
-    ax.scatter(ball[0], ball[1], c='yellow', s=50, zorder=2)
+    ax.scatter(offense[:,0],offense[:,1], c='b', s=150, zorder=3)
+    ax.scatter(defense[:,0],defense[:,1], c='r', s=150, zorder=3)
+    ax.scatter(ball[0], ball[1], c='yellow', s=50, zorder=3)
     return fig, ax
 
 def show_voronoi(row):
@@ -109,11 +110,11 @@ def get_dx_dy(radian_angle, dist):
     dy = dist * math.sin(radian_angle)
     return dx, dy
 
-def draw_player_pitch_control(X, Y, pitch_control, x_player, y_player, theta,speed, row):
+def draw_player_influence_area(X, Y, player_influence, x_player, y_player, theta,speed, row):
     fig, ax = show_players_and_ball(row)
     dx, dy = get_dx_dy(theta, speed)
     ax.arrow(x_player, y_player, dx, dy, length_includes_head=False, width=0.2, color='black', alpha=0.5)
-    contours = plt.contour(X, Y, pitch_control, cmap='RdBu')
+    contours = plt.contour(X, Y, player_influence, cmap='RdBu')
     plt.clabel(contours, inline=True, fontsize=12)
     plt.title('Player Influence Area', fontsize=24, color='white')
 
@@ -121,4 +122,21 @@ def draw_player_pitch_control(X, Y, pitch_control, x_player, y_player, theta,spe
     fig.canvas.draw()       # draw the canvas, cache the renderer
     image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
     image  = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+    return image
+
+def draw_pitch_control(X, Y, pitch_control, row):
+    fig, ax = show_players_and_ball(row)
+    plt.contour(X, Y, pitch_control, colors='black', zorder=2,  vmin=0.2, vmax=0.8)
+
+    plt.imshow(pitch_control, extent=[-52.5, 52.5, -35, 35], origin='lower',
+            cmap='RdBu', alpha=0.5, zorder=1)
+
+    plt.clim(0.2, 0.8)  # manually setup the range of the colorscale and colorbar
+    plt.colorbar()
+
+    # Used to return the plot as an image rray
+    fig.canvas.draw()       # draw the canvas, cache the renderer
+    image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
+    image  = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
     return image

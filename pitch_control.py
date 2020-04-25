@@ -53,16 +53,27 @@ def compute_player_influence(x_points, y_points, theta, speed, player_coords, ba
         ,4)
 
 
-def compute(x_points, y_points):
+def compute(x_points, y_points, df_play):
     '''Compute the pitch control over a coordinate (x, y)
     '''
+    df_offense = df_play.loc[df_play.IsOnOffense,['X', 'Y', 'S', 'Dir', 'Ball_X', 'Ball_Y']]
     offense_score = np.zeros([len(x_points),len(x_points[0])])
-    for offense_id in offense_ids:
-        offense_score = offense_score + compute_influence(x_points, y_points, offense_id)
+    for i, row in df_offense.iterrows():
+        [x_point, y_point, speed, theta, ball_x, ball_y] = row
+        player_coords = [x_point, y_point]
+        ball_coords = [ball_x, ball_y]
+        offense_score = (offense_score +
+                            compute_player_influence(x_points, y_points, theta, speed, player_coords, ball_coords))
 
+    df_defense = df_play.loc[~df_play.IsOnOffense,['X', 'Y', 'S', 'Dir', 'Ball_X', 'Ball_Y']]
     defense_score = np.zeros([len(x_points),len(x_points[0])])
-    for defense_id in defense_ids:
-        defense_score = defense_score + compute_influence(x_points, y_points, defense_id)
+    for i, row in df_defense.iterrows():
+        [x_point, y_point, speed, theta, ball_x, ball_y] = row
+        player_coords = [x_point, y_point]
+        ball_coords = [ball_x, ball_y]
+        defense_score = (defense_score +
+                            compute_player_influence(x_points, y_points, theta, speed, player_coords, ball_coords))
+
 
     return expit(offense_score - defense_score)
 
